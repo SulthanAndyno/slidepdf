@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=SlidePDF Studio
+GenericName=PPTX to PDF Converter
+Comment=Professional PowerPoint to PDF conversion studio with multi-engine support
+Exec=/workspace/Projects/pptx-to-pdf-converter/run.sh
+Icon=/workspace/Projects/pptx-to-pdf-converter/assets/icon.png
+Terminal=false
+Categories=Office;Utility;Graphics;
+Keywords=pptx;pdf;converter;powerpoint;presentation;slides;
+StartupNotify=true
