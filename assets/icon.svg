@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="pptxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e67e22"/>
+      <stop offset="100%" stop-color="#d35400"/>
+    </linearGradient>
+    <linearGradient id="pdfGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e74c3c"/>
+      <stop offset="100%" stop-color="#c0392b"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="232" height="232" rx="48" fill="url(#bg)"/>
+  <!-- PPTX Card -->
+  <rect x="36" y="48" width="104" height="160" rx="16" fill="url(#pptxGrad)"/>
+  <text x="64" y="150" font-family="sans-serif" font-weight="900" font-size="70" fill="#ffffff">P</text>
+  <!-- PDF Card -->
+  <rect x="116" y="48" width="104" height="160" rx="16" fill="url(#pdfGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <!-- Arrow circle -->
+  <circle cx="128" cy="138" r="30" fill="#2980b9" stroke="#ffffff" stroke-width="3"/>
+  <path d="M 120 126 L 142 138 L 120 150 Z" fill="#ffffff"/>
+</svg>
