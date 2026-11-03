@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slidepdf-studio"
+version = "1.0.0"
+description = "Professional PPTX to PDF Converter Studio - Multi-Engine Desktop & CLI"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "SlidePDF Team" }
+]
+keywords = [
+    "pptx",
+    "powerpoint",
+    "pdf",
+    "converter",
+    "libreoffice",
+    "customtkinter",
+    "desktop-app",
+    "cli"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Graphics :: Presentation",
+    "Topic :: Office/Business :: Office Suites",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "customtkinter>=5.2.0",
+    "python-pptx>=1.0.0",
+    "reportlab>=4.0.0",
+    "pypdf>=5.0.0",
+    "pillow>=10.0.0",
+    "rich>=13.0.0",
+    "darkdetect>=0.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pyinstaller>=6.0.0",
+]
+windows = [
+    "pywin32>=306; sys_platform == 'win32'",
+]
+
+[project.scripts]
+slidepdf = "slidepdf.app:main"
+slidepdf-cli = "slidepdf.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

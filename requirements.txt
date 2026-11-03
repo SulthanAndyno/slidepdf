@@ -1,0 +1,9 @@
+customtkinter>=5.2.0
+python-pptx>=1.0.0
+reportlab>=4.0.0
+pypdf>=5.0.0
+pillow>=10.0.0
+rich>=13.0.0
+darkdetect>=0.8.0
+pyinstaller>=6.0.0
+pytest>=8.0.0
