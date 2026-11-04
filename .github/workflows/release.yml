@@ -1,0 +1,73 @@
+name: Build & Release Standalone Binaries
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Standalone Executable
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: SlidePDF-Studio-Linux
+            asset_name: SlidePDF-Studio-Linux-x86_64
+          - os: windows-latest
+            artifact_name: SlidePDF-Studio.exe
+            asset_name: SlidePDF-Studio-Windows-x64.exe
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Build Standalone Executable with PyInstaller
+      run: |
+        python scripts/build_executable.py --onefile
+
+    - name: Rename Artifact (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        mv dist/SlidePDF-Studio dist/${{ matrix.asset_name }}
+
+    - name: Rename Artifact (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        Move-Item dist/SlidePDF-Studio.exe dist/${{ matrix.asset_name }}
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.asset_name }}
+        path: dist/${{ matrix.asset_name }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            */*
+          generate_release_notes: true
