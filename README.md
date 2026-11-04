@@ -13,6 +13,7 @@
   <img src="https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue?style=flat-square" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
   <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-orange?style=flat-square" />
+  <img src="https://img.shields.io/badge/CI-GitHub%20Actions-brightgreen?style=flat-square" />
   <img src="https://img.shields.io/badge/Build-PyInstaller%20Ready-purple?style=flat-square" />
 </p>
 
@@ -96,9 +97,15 @@ Aplikasi sudah terdaftar di sistem (`~/.local/share/applications/slidepdf.deskto
 ## 📁 Struktur Direktori Proyek
 
 ```text
-pptx-to-pdf-converter/
+slidepdf/
+├── .github/workflows/          # CI/CD otomatis (testing & release build)
+│   ├── ci.yml                  # Automated pytest di Linux & Windows
+│   └── release.yml             # Auto-build executable saat git tag release
 ├── pyproject.toml              # Standar packaging PEP 518/621
 ├── requirements.txt            # Dependensi Python
+├── Makefile                    # Shortcut developer (make install, make test, dll)
+├── install.sh                  # Skrip installer 1-klik untuk integrasi sistem
+├── CONTRIBUTING.md             # Panduan kontributor open-source
 ├── README.md                   # Dokumentasi lengkap
 ├── ARCHITECTURE.md             # Arsitektur & desain teknis mesin
 ├── LICENSE                     # Lisensi open-source (MIT)
@@ -108,34 +115,8 @@ pptx-to-pdf-converter/
 ├── assets/
 │   ├── icon.png                # Icon aplikasi resolusi tinggi (PNG)
 │   └── icon.svg                # Icon aplikasi format vektor (SVG)
-├── src/
-│   └── slidepdf/
-│       ├── __init__.py         # Versi & metadata package
-│       ├── app.py              # Entrypoint utama Desktop GUI (CustomTkinter)
-│       ├── cli.py              # Entrypoint Command Line Interface (CLI)
-│       ├── core/
-│       │   ├── converter.py    # Pipeline coordinator & queue manager
-│       │   ├── models.py       # Dataclass & Enum (Job, Options, Status)
-│       │   ├── merger.py       # PDF Merger & outline bookmark builder
-│       │   ├── utils.py        # Pemeriksa PPTX, parser slide range, path resolver
-│       │   └── engines/
-│       │       ├── base.py         # Abstract Base Class engine
-│       │       ├── detector.py     # Engine discovery & system diagnostics
-│       │       ├── libreoffice.py  # LibreOffice headless daemon engine
-│       │       ├── msoffice.py     # Windows COM automation engine
-│       │       └── native.py       # Pure-Python canvas renderer
-│       └── ui/
-│           ├── main_window.py  # Layout jendela utama aplikasi
-│           ├── theme.py        # Konstanta warna, font & styling
-│           └── components/     # Komponen UI modular
-│               ├── engine_badge.py   # Badge status engine & dialog diagnostik
-│               ├── file_queue.py     # Tabel antrean berkas & item card
-│               ├── log_drawer.py     # Drawer terminal log di bagian bawah
-│               └── settings_panel.py # Panel konfigurasi sidebar kiri
-├── scripts/
-│   ├── build_executable.py     # Skrip otomasi build executable (.exe / binary)
-│   ├── generate_icons.py       # Generator icon aplikasi
-│   └── generate_sample_pptx.py # Generator contoh presentasi uji
+├── src/slidepdf/               # Sumber kode aplikasi
+├── scripts/                    # Skrip build & tools
 ├── samples/                    # Contoh berkas presentasi untuk uji coba
 └── tests/                      # Rangkaian pengujian unit & integrasi (Pytest)
 ```
@@ -144,13 +125,21 @@ pptx-to-pdf-converter/
 
 ## 🚀 Panduan Penggunaan Cepat (Quickstart)
 
-### 1. Instalasi Lingkungan (Environment Setup)
+### 1. Instalasi Otomatis (Rekomendasi Linux)
+Kamu bisa menggunakan installer 1-klik untuk memasang dependensi, shortcut aplikasi desktop, integrasi klik-kanan Nautilus, dan command terminal:
+
+```bash
+cd /workspace/Projects/slidepdf
+bash install.sh
+```
+
+### 2. Instalasi Manual
 
 Gunakan `uv` (sangat cepat) atau `pip` standar:
 
 ```bash
-# Clone atau masuk ke direktori proyek
-cd /workspace/Projects/pptx-to-pdf-converter
+# Masuk ke direktori proyek
+cd /workspace/Projects/slidepdf
 
 # Buat virtual environment
 uv venv
@@ -158,6 +147,8 @@ source .venv/bin/activate   # Di Linux/macOS
 # atau di Windows: .venv\Scripts\activate
 
 # Install dependensi
+uv pip install -r requirements.txt
+```
 uv pip install -r requirements.txt
 ```
 
