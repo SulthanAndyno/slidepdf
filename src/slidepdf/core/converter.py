@@ -19,6 +19,7 @@ from slidepdf.core.utils import (
     get_default_output_path,
     open_file_in_system_viewer,
     open_folder_in_file_manager,
+    sanitize_filename_component,
 )
 
 
@@ -132,8 +133,11 @@ class ConversionManager:
             if on_batch_progress:
                 on_batch_progress(0.92, "Merging all converted presentations into a single PDF...")
 
-            dest_dir = options.output_dir or (jobs[0].input_path.parent if jobs else Path.cwd())
-            merge_target = dest_dir / options.merge_filename
+            dest_dir = (options.output_dir or (jobs[0].input_path.parent if jobs else Path.cwd())).resolve()
+            clean_merge_fn = sanitize_filename_component(options.merge_filename) or "merged_presentation.pdf"
+            if not clean_merge_fn.lower().endswith(".pdf"):
+                clean_merge_fn += ".pdf"
+            merge_target = dest_dir / clean_merge_fn
 
             merged_path = PDFMergerUtil.merge_pdfs(
                 pdf_paths=generated_pdfs,
