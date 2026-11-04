@@ -3,25 +3,31 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "slidepdf-studio"
+name = "slidepdf"
 version = "1.0.0"
-description = "Professional PPTX to PDF Converter Studio - Multi-Engine Desktop & CLI"
+description = "Professional Presentation to PDF Converter Studio - Multi-Engine Desktop & CLI"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
-    { name = "SlidePDF Team" }
+    { name = "Sulthan Andyno", email = "sulthandyno@gmail.com" }
 ]
 keywords = [
     "pptx",
     "powerpoint",
     "pdf",
     "converter",
+    "odp",
     "libreoffice",
     "customtkinter",
     "desktop-app",
     "cli"
 ]
+
+[project.urls]
+Homepage = "https://github.com/SulthanAndyno/slidepdf"
+Repository = "https://github.com/SulthanAndyno/slidepdf"
+Issues = "https://github.com/SulthanAndyno/slidepdf/issues"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: End Users/Desktop",
