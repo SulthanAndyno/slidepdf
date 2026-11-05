@@ -19,11 +19,15 @@ class QueueItemRow(ctk.CTkFrame):
         master,
         job: ConversionJob,
         on_remove: Callable[[str], None],
+        on_move_up: Optional[Callable[[str], None]] = None,
+        on_move_down: Optional[Callable[[str], None]] = None,
         **kwargs,
     ):
         super().__init__(master, corner_radius=8, height=48, **kwargs)
         self.job = job
         self.on_remove = on_remove
+        self.on_move_up = on_move_up
+        self.on_move_down = on_move_down
 
         self._build_ui()
 
@@ -114,11 +118,38 @@ class QueueItemRow(ctk.CTkFrame):
         self.open_btn.grid(row=0, column=4, padx=4, pady=8)
         self.open_btn.grid_remove()  # only show when completed
 
-        # 6. Remove button
+        # 6. Reorder buttons (Move Up / Move Down)
+        self.move_up_btn = ctk.CTkButton(
+            self,
+            text="▲",
+            width=22,
+            height=24,
+            font=theme.FONT_SMALL,
+            fg_color="transparent",
+            hover_color="#334455",
+            text_color="#888888",
+            command=lambda: self.on_move_up(self.job.job_id) if self.on_move_up else None,
+        )
+        self.move_up_btn.grid(row=0, column=5, padx=1, pady=8)
+
+        self.move_down_btn = ctk.CTkButton(
+            self,
+            text="▼",
+            width=22,
+            height=24,
+            font=theme.FONT_SMALL,
+            fg_color="transparent",
+            hover_color="#334455",
+            text_color="#888888",
+            command=lambda: self.on_move_down(self.job.job_id) if self.on_move_down else None,
+        )
+        self.move_down_btn.grid(row=0, column=6, padx=1, pady=8)
+
+        # 7. Remove button
         self.remove_btn = ctk.CTkButton(
             self,
             text="✕",
-            width=26,
+            width=24,
             height=24,
             font=theme.FONT_SMALL,
             fg_color="transparent",
@@ -126,7 +157,7 @@ class QueueItemRow(ctk.CTkFrame):
             text_color="#aaaaaa",
             command=lambda: self.on_remove(self.job.job_id),
         )
-        self.remove_btn.grid(row=0, column=5, padx=(2, 10), pady=8)
+        self.remove_btn.grid(row=0, column=7, padx=(2, 10), pady=8)
 
     def _open_result(self) -> None:
         if self.job.output_path and self.job.output_path.exists():
@@ -207,7 +238,13 @@ class FileQueueView(ctk.CTkFrame):
             existing_paths.add(p_res)
 
             # Create visual row
-            row = QueueItemRow(self.scroll_frame, job, on_remove=self.remove_job)
+            row = QueueItemRow(
+                self.scroll_frame,
+                job,
+                on_remove=self.remove_job,
+                on_move_up=self.move_job_up,
+                on_move_down=self.move_job_down,
+            )
             row.pack(fill="x", padx=4, pady=3)
             self._item_rows[job.job_id] = row
             added_count += 1
@@ -216,6 +253,28 @@ class FileQueueView(ctk.CTkFrame):
         if self.on_queue_change:
             self.on_queue_change(len(self.jobs))
         return added_count
+
+    def move_job_up(self, job_id: str) -> None:
+        """Move a job one position earlier in queue."""
+        idx = next((i for i, j in enumerate(self.jobs) if j.job_id == job_id), -1)
+        if idx > 0:
+            self.jobs[idx - 1], self.jobs[idx] = self.jobs[idx], self.jobs[idx - 1]
+            self._repack_rows()
+
+    def move_job_down(self, job_id: str) -> None:
+        """Move a job one position later in queue."""
+        idx = next((i for i, j in enumerate(self.jobs) if j.job_id == job_id), -1)
+        if 0 <= idx < len(self.jobs) - 1:
+            self.jobs[idx], self.jobs[idx + 1] = self.jobs[idx + 1], self.jobs[idx]
+            self._repack_rows()
+
+    def _repack_rows(self) -> None:
+        """Re-pack row widgets in the current self.jobs order."""
+        for job in self.jobs:
+            row = self._item_rows.get(job.job_id)
+            if row:
+                row.pack_forget()
+                row.pack(fill="x", padx=4, pady=3)
 
     def remove_job(self, job_id: str) -> None:
         """Remove a job from the queue."""
