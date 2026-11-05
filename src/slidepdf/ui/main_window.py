@@ -107,7 +107,7 @@ class MainWindow(ctk.CTk):
         # Left: Settings Sidebar
         self.settings_panel = SettingsPanel(
             self.main_content,
-            width=290,
+            width=315,
             on_engine_change=self._on_engine_change,
         )
         self.settings_panel.pack(side="left", fill="y", padx=(0, 12))
