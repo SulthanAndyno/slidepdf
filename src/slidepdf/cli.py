@@ -100,6 +100,10 @@ def cmd_convert(args: argparse.Namespace) -> int:
         prefix=args.prefix or "",
         suffix=args.suffix or "",
         open_after_conversion=args.open,
+        watermark_text=args.watermark,
+        watermark_opacity=args.watermark_opacity,
+        password=args.password,
+        handout_mode=args.handout,
     )
 
     out_file = Path(args.output) if args.output else None
@@ -179,6 +183,10 @@ def cmd_batch(args: argparse.Namespace) -> int:
         prefix=args.prefix or "",
         suffix=args.suffix or "",
         open_after_conversion=args.open,
+        watermark_text=args.watermark,
+        watermark_opacity=args.watermark_opacity,
+        password=args.password,
+        handout_mode=args.handout,
     )
 
     jobs = [ConversionJob(input_path=p) for p in found_files]
@@ -264,6 +272,16 @@ def build_parser() -> argparse.ArgumentParser:
     p_convert.add_argument("--prefix", default="", help="Prefix added to output filename")
     p_convert.add_argument("--suffix", default="", help="Suffix added to output filename")
     p_convert.add_argument("--open", action="store_true", help="Open PDF in default viewer when finished")
+    p_convert.add_argument("--watermark", help="Transparent text watermark to stamp on slides")
+    p_convert.add_argument("--watermark-opacity", type=float, default=0.2, help="Watermark opacity (0.05 to 1.0, default: 0.2)")
+    p_convert.add_argument("--password", help="Encrypt and password-protect the output PDF")
+    p_convert.add_argument(
+        "--handout",
+        type=int,
+        choices=[1, 2, 4],
+        default=1,
+        help="Handout layout (1: standard 1-up, 2: 2 slides/page, 4: 4 slides/page)",
+    )
     p_convert.set_defaults(func=cmd_convert)
 
     # Command: batch
@@ -285,6 +303,16 @@ def build_parser() -> argparse.ArgumentParser:
     p_batch.add_argument("--prefix", default="", help="Prefix for output filenames")
     p_batch.add_argument("--suffix", default="", help="Suffix for output filenames")
     p_batch.add_argument("--open", action="store_true", help="Open merged PDF when complete")
+    p_batch.add_argument("--watermark", help="Transparent text watermark to stamp across slides")
+    p_batch.add_argument("--watermark-opacity", type=float, default=0.2, help="Watermark opacity (0.05 to 1.0, default: 0.2)")
+    p_batch.add_argument("--password", help="Encrypt and password-protect the output PDF")
+    p_batch.add_argument(
+        "--handout",
+        type=int,
+        choices=[1, 2, 4],
+        default=1,
+        help="Handout layout (1: standard 1-up, 2: 2 slides/page, 4: 4 slides/page)",
+    )
     p_batch.set_defaults(func=cmd_batch)
 
     # Command: doctor
