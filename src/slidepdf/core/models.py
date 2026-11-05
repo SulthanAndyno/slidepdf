@@ -55,6 +55,11 @@ class ConversionOptions:
     overwrite: bool = True
     open_after_conversion: bool = False
     open_folder_after: bool = False
+    # Post-processing enhancements
+    watermark_text: Optional[str] = None
+    watermark_opacity: float = 0.2
+    password: Optional[str] = None
+    handout_mode: int = 1  # 1 (Normal 1-up), 2 (2-up Handout), 4 (4-up Handout)
 
 
 @dataclass
