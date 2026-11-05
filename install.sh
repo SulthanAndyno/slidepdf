@@ -40,34 +40,33 @@ fi
 # 3. Install Global CLI Command to ~/.local/bin
 mkdir -p "$HOME/.local/bin"
 LAUNCHER="$HOME/.local/bin/slidepdf"
-cat > "$LAUNCHER" << 'EOF'
+cat > "$LAUNCHER" << EOF
 #!/usr/bin/env bash
 # SlidePDF Global CLI / GUI Launcher
-PROJECT_DIR="##PROJECT_DIR##"
-EXEC="$PROJECT_DIR/run.sh"
+PROJECT_DIR="$SCRIPT_DIR"
+EXEC="\$PROJECT_DIR/run.sh"
 
-if [ ! -f "$EXEC" ]; then
-    echo "Error: SlidePDF Studio not found at $EXEC" >&2
+if [ ! -f "\$EXEC" ]; then
+    echo "Error: SlidePDF Studio not found at \$EXEC" >&2
     exit 1
 fi
 
-if [ $# -eq 1 ] && [ -f "$1" ]; then
-    EXT="${1##*.}"
-    EXT_LOWER="$(echo "$EXT" | tr '[:upper:]' '[:lower:]')"
-    case "$EXT_LOWER" in
+if [ \$# -eq 1 ] && [ -f "\$1" ]; then
+    EXT="\${1##*.}"
+    EXT_LOWER="\$(echo "\$EXT" | tr '[:upper:]' '[:lower:]')"
+    case "\$EXT_LOWER" in
         pptx|ppt|pptm|ppsx|pps|potx|pot|odp|png|jpg|jpeg|webp|bmp|tiff|docx|doc|odt)
-            echo "⚡ Converting '$1' to PDF..."
-            exec "$EXEC" convert "$1"
+            echo "⚡ Converting '\$1' to PDF..."
+            exec "\$EXEC" convert "\$1"
             ;;
         *)
-            exec "$EXEC" "$@"
+            exec "\$EXEC" "\$@"
             ;;
     esac
 else
-    exec "$EXEC" "$@"
+    exec "\$EXEC" "\$@"
 fi
 EOF
-sed -i "s|##PROJECT_DIR##|$SCRIPT_DIR|g" "$LAUNCHER"
 chmod +x "$LAUNCHER"
 ln -sf "$LAUNCHER" "$HOME/.local/bin/pptx2pdf"
 echo "✓ Global CLI installed: slidepdf, pptx2pdf in ~/.local/bin"
