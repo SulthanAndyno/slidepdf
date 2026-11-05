@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 from typing import Callable, List, Optional
 
+from slidepdf.core.effects import apply_post_processing
 from slidepdf.core.engines.detector import EngineDetector
 from slidepdf.core.merger import PDFMergerUtil
 from slidepdf.core.models import (
@@ -43,6 +44,7 @@ class ConversionManager:
         job: ConversionJob,
         options: ConversionOptions,
         on_progress: Optional[Callable[[float, str], None]] = None,
+        apply_effects: bool = True,
     ) -> Path:
         """Execute conversion for a single presentation job."""
         self._is_cancelled = False
@@ -62,6 +64,10 @@ class ConversionManager:
                     on_progress(pct, msg)
 
             output_file = engine.convert(job, options, progress_callback=_progress_wrapper)
+
+            # Apply post-processing effects (handout, watermark, password encryption)
+            if apply_effects and output_file.exists():
+                output_file = apply_post_processing(output_file, options)
 
             job.status = JobStatus.COMPLETED
             job.progress = 1.0
@@ -118,7 +124,12 @@ class ConversionManager:
                     on_job_progress(job, pct, msg)
 
             try:
-                out_path = self.convert_single(job, options, on_progress=_job_progress_cb)
+                out_path = self.convert_single(
+                    job,
+                    options,
+                    on_progress=_job_progress_cb,
+                    apply_effects=not options.merge_all,
+                )
                 generated_pdfs.append(out_path)
                 batch_result.completed_jobs += 1
                 if on_job_complete:
@@ -145,10 +156,15 @@ class ConversionManager:
                 add_bookmarks=True,
                 title="Consolidated Presentation Document",
             )
+
+            # Apply post-processing (handout, watermark, password) to merged document
+            merged_path = apply_post_processing(merged_path, options)
             batch_result.merged_pdf_path = merged_path
 
             if options.open_after_conversion and merged_path.exists():
                 open_file_in_system_viewer(merged_path)
+            elif options.open_folder_after and merged_path.exists():
+                open_folder_in_file_manager(merged_path.parent)
 
         batch_result.total_elapsed_seconds = time.time() - batch_start_time
 
