@@ -33,25 +33,32 @@
    - 📦 **Native Python Engine**: Engine bawaan pure-Python (berbasis `python-pptx`, `Pillow`, dan `ReportLab`). Siap konversi langsung **tanpa wajib install LibreOffice atau Microsoft Office**!
    - 🤖 **Auto-Detect Engine**: Otomatis mendeteksi engine terbaik di sistem komputer pengguna.
 
-2. **Modern Desktop GUI (CustomTkinter)**:
+3. **Modern Desktop GUI (CustomTkinter)**:
    - Antarmuka modern dengan Dark Mode & Light Mode switch.
    - Sistem antrean (Queue Table) dengan indikator status file, progress bar per file, ukuran, dan jumlah slide.
+   - 🔼 **Queue Reordering**: Tombol `▲` (Move Up) dan `▼` (Move Down) pada setiap baris antrean untuk mengatur urutan penggabungan file (*merge order*).
    - Background worker multi-threading sehingga aplikasi **tidak pernah freeze/not-responding** saat mengonversi file besar.
    - Expandable Log Console Drawer untuk memantau proses secara transparan.
 
-3. **Batch Processing & Master PDF Merging**:
+4. **Fitur Lanjutan Pasca-Konversi (Advanced Post-Processing)**:
+   - 🖨️ **Handout / N-Up Layout**: Ubah orientasi cetak hemat kertas (1 Slide Full, 2 Slide per halaman, atau 4 Slide per halaman grid 2x2) untuk materi seminar/kuliah.
+   - 🏷️ **Custom Watermark**: Cap stempel teks transparan diagonal (e.g. `CONFIDENTIAL`, `DRAFT`, `INTERNAL ONLY`) di seluruh halaman PDF.
+   - 🔒 **PDF Security & Encryption**: Kunci dan amankan berkas PDF menggunakan enkripsi standar industri AES dengan proteksi password pengguna.
+
+5. **Batch Processing & Master PDF Merging**:
    - Konversi banyak file sekaligus (folder scan rekursif).
    - Mode **Merge All into 1 PDF**: Menggabungkan seluruh presentasi dalam antrean menjadi 1 file PDF lengkap dengan bookmark/outline per presentasi.
 
-4. **Kontrol Halaman & Kompresi**:
+6. **Kontrol Halaman & Kompresi**:
    - Filter halaman/slide spesifik (contoh: `1-5, 8, 10-12`).
    - Pilihan kualitas: **Standard (High-Res Vector)** vs **Compressed (Optimasi Web & Email)**.
 
-5. **Powerful Command-Line Interface (CLI)**:
+7. **Powerful Command-Line Interface (CLI)**:
    - Perintah terminal lengkap dengan progress bar warna-warni (`rich`).
+   - Mendukung opsi `--watermark`, `--password`, dan `--handout` langsung dari CLI.
    - Tool `slidepdf doctor` untuk mengecek status engine dan kesiapan sistem.
 
-6. **Siap Dipaketkan Menjadi Software Standalone (`.exe` / Binary)**:
+8. **Siap Dipaketkan Menjadi Software Standalone (`.exe` / Binary)**:
    - Dilengkapi script PyInstaller otomatis (`scripts/build_executable.py`) untuk membuat file executable portable.
 
 ---
@@ -63,7 +70,7 @@ SlidePDF Studio sudah diintegrasikan langsung ke sistem kamu dengan 4 tingkatan 
 ### 1. File Executable Langsung di Workspace
 Executable standalone (portable single-file) sekarang tersedia langsung di root workspace:
 - 🚀 **[`/workspace/SlidePDF-Studio`](file:///workspace/SlidePDF-Studio)** (bisa langsung diklik 2x atau dijalankan `./SlidePDF-Studio`)
-- 📦 Lokasi binary asli: [`/workspace/Projects/pptx-to-pdf-converter/dist/SlidePDF-Studio`](file:///workspace/Projects/pptx-to-pdf-converter/dist/SlidePDF-Studio)
+- 📦 Lokasi binary asli: [`/workspace/Projects/slidepdf/dist/SlidePDF-Studio`](file:///workspace/Projects/slidepdf/dist/SlidePDF-Studio)
 
 ### 2. Global Terminal Command (Dari Folder Mana Saja)
 Karena sudah dimasukkan ke `$PATH`, kamu bisa mengetik perintah berikut di terminal mana pun:
