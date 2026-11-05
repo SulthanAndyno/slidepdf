@@ -109,15 +109,21 @@ class LibreOfficeEngine(BaseEngine):
 
         # Use an isolated temporary directory for the conversion
         with tempfile.TemporaryDirectory(prefix="slidepdf_lo_") as tmp_dir:
-            tmp_out_dir = Path(tmp_dir)
+            tmp_out_dir = Path(tmp_dir) / "output"
+            tmp_out_dir.mkdir(parents=True, exist_ok=True)
+            tmp_profile_dir = Path(tmp_dir) / "profile"
+            tmp_profile_dir.mkdir(parents=True, exist_ok=True)
+
             cmd = [
                 self._binary_path,
                 "--headless",
                 "--invisible",
                 "--nologo",
                 "--nodefault",
+                f"-env:UserInstallation={tmp_profile_dir.as_uri()}",
                 "--convert-to",
                 "pdf",
+                "--",
                 str(input_path.resolve()),
                 "--outdir",
                 str(tmp_out_dir.resolve()),
