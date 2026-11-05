@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Callable, List, Optional
 
@@ -46,16 +47,21 @@ class PDFMergerUtil:
                     f"Merging ({idx}/{total}): {pdf.name}...",
                 )
 
-            # Use presentation stem as the bookmark title
-            bookmark_title = pdf.stem if add_bookmarks else None
+            # Use presentation stem as the bookmark title (sanitized)
+            bookmark_title = (
+                re.sub(r"[\x00-\x1f\x7f-\x9f]", "", pdf.stem).strip()
+                if add_bookmarks
+                else None
+            )
             writer.append(str(pdf), outline_item=bookmark_title)
 
         if progress_callback:
             progress_callback(0.95, "Writing merged PDF file to disk...")
 
-        # Add document metadata
+        # Add sanitized document metadata
+        clean_title = re.sub(r"[\x00-\x1f\x7f-\x9f]", "", title).strip() or "Merged Presentations"
         writer.add_metadata({
-            "/Title": title,
+            "/Title": clean_title,
             "/Producer": "SlidePDF Studio",
             "/Creator": "SlidePDF Studio PDF Merger",
         })
