@@ -139,7 +139,16 @@ class NativePythonEngine(BaseEngine):
         if progress_callback:
             progress_callback(0.2, f"Opening image {input_path.name}...")
 
-        pil_img = Image.open(input_path)
+        try:
+            pil_img = Image.open(input_path)
+            # Verify file integrity
+            pil_img.verify()
+            pil_img = Image.open(input_path)
+        except Image.DecompressionBombError as dbe:
+            raise ValueError(f"Image {input_path.name} exceeds maximum safe dimensions: {dbe}") from dbe
+        except Exception as exc:
+            raise ValueError(f"Corrupted or invalid image file {input_path.name}: {exc}") from exc
+
         img_w, img_h = pil_img.size
 
         # 1 px = 0.75 points (at 96 DPI screen standard)
