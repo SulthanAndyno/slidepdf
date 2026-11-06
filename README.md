@@ -42,8 +42,10 @@
 
 4. **Fitur Lanjutan Pasca-Konversi (Advanced Post-Processing)**:
    - 🖨️ **Handout / N-Up Layout**: Ubah orientasi cetak hemat kertas (1 Slide Full, 2 Slide per halaman, atau 4 Slide per halaman grid 2x2) untuk materi seminar/kuliah.
+   - 🔢 **Slide Page Numbering**: Penomoran halaman otomatis (*Page X of Y*) pada footer slide dengan format dan posisi yang rapi.
    - 🏷️ **Custom Watermark**: Cap stempel teks transparan diagonal (e.g. `CONFIDENTIAL`, `DRAFT`, `INTERNAL ONLY`) di seluruh halaman PDF.
    - 🔒 **PDF Security & Encryption**: Kunci dan amankan berkas PDF menggunakan enkripsi standar industri AES dengan proteksi password pengguna.
+   - ⚡ **PDF Stream Optimization**: Kompresi stream Flate dan deduplikasi objek identik untuk menghasilkan ukuran file PDF yang sangat ramping.
 
 5. **Batch Processing & Master PDF Merging**:
    - Konversi banyak file sekaligus (folder scan rekursif).
@@ -55,7 +57,7 @@
 
 7. **Powerful Command-Line Interface (CLI)**:
    - Perintah terminal lengkap dengan progress bar warna-warni (`rich`).
-   - Mendukung opsi `--watermark`, `--password`, dan `--handout` langsung dari CLI.
+   - Mendukung opsi `--watermark`, `--password`, `--handout`, dan `--page-numbers` langsung dari CLI.
    - Tool `slidepdf doctor` untuk mengecek status engine dan kesiapan sistem.
 
 8. **Siap Dipaketkan Menjadi Software Standalone (`.exe` / Binary)**:

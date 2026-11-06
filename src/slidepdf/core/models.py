@@ -60,6 +60,8 @@ class ConversionOptions:
     watermark_opacity: float = 0.2
     password: Optional[str] = None
     handout_mode: int = 1  # 1 (Normal 1-up), 2 (2-up Handout), 4 (4-up Handout)
+    page_numbers: bool = False
+    page_number_format: str = "Page {n} of {total}"
 
 
 @dataclass

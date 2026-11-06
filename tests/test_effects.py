@@ -7,10 +7,14 @@ import pytest
 from reportlab.pdfgen import canvas
 
 from slidepdf.core.effects import (
+    _safe_write_pdf,
     apply_encryption,
+    apply_optimization,
+    apply_page_numbers,
     apply_post_processing,
     apply_watermark,
     create_handout,
+    generate_page_number_page,
     generate_watermark_page,
 )
 from slidepdf.core.models import ConversionJob, ConversionOptions
@@ -140,3 +144,70 @@ def test_queue_reordering_logic():
         assert [j.job_id for j in queue_view.jobs] == [job1.job_id, job2.job_id, job3.job_id]
     finally:
         root.destroy()
+
+
+def test_generate_page_number_page():
+    """Verify page number overlay generation produces a valid PageObject."""
+    num_page = generate_page_number_page(960, 540, page_num=1, total_pages=5)
+    assert isinstance(num_page, pypdf.PageObject)
+    assert float(num_page.mediabox.width) == 960
+    assert float(num_page.mediabox.height) == 540
+
+
+def test_apply_page_numbers(tmp_path):
+    """Test applying slide page numbers to all pages."""
+    src = _create_sample_pdf(3, tmp_path / "numbered_src.pdf")
+    dest = tmp_path / "numbered_out.pdf"
+
+    result = apply_page_numbers(src, dest, format_str="Slide {n} / {total}")
+    assert result.exists()
+
+    with pypdf.PdfReader(str(result)) as reader:
+        assert len(reader.pages) == 3
+
+
+def test_apply_optimization(tmp_path):
+    """Test PDF stream and identical object compression."""
+    src = _create_sample_pdf(3, tmp_path / "unoptimized.pdf")
+    dest = tmp_path / "optimized.pdf"
+
+    result = apply_optimization(src, dest)
+    assert result.exists()
+    assert result.stat().st_size > 0
+
+
+def test_watermark_sanitization():
+    """Verify watermark text sanitization removes control characters and handles excessive length."""
+    long_text = "CONFIDENTIAL\x00\x1f" + "A" * 500
+    page = generate_watermark_page(800, 600, long_text)
+    assert isinstance(page, pypdf.PageObject)
+
+
+def test_encrypted_pdf_error_handling(tmp_path):
+    """Verify attempting to watermark an already encrypted PDF raises ValueError gracefully."""
+    src = _create_sample_pdf(2, tmp_path / "plain_for_enc.pdf")
+    enc_path = tmp_path / "already_encrypted.pdf"
+    apply_encryption(src, enc_path, user_password="pass")
+
+    out_path = tmp_path / "should_fail.pdf"
+    with pytest.raises(ValueError, match="Cannot apply watermark to encrypted PDF"):
+        apply_watermark(enc_path, out_path, text="DRAFT")
+
+
+def test_safe_write_pdf_cleanup_on_error(tmp_path, monkeypatch):
+    """Verify temporary files are cleaned up if an exception occurs during writing."""
+    writer = pypdf.PdfWriter()
+    writer.add_blank_page(100, 100)
+    target = tmp_path / "target.pdf"
+
+    def faulty_write(f):
+        raise OSError("Disk full simulation")
+
+    monkeypatch.setattr(writer, "write", faulty_write)
+
+    with pytest.raises(OSError, match="Disk full simulation"):
+        _safe_write_pdf(writer, target)
+
+    # Ensure no temporary .pdf files remain in directory
+    temp_files = list(tmp_path.glob("*.pdf"))
+    assert len(temp_files) == 0

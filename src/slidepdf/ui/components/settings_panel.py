@@ -61,9 +61,19 @@ class SettingsPanel(ctk.CTkScrollableFrame):
             values=["1 Slide (Full)", "2 Slides", "4 Slides"],
             variable=self.handout_var,
         )
-        self.handout_seg.pack(fill="x", padx=12, pady=(0, 8))
+        self.handout_seg.pack(fill="x", padx=12, pady=(0, 6))
 
-        # 3. Watermark Overlay
+        # 3. Slide Page Numbering
+        self.page_numbers_var = ctk.BooleanVar(value=False)
+        self.page_numbers_check = ctk.CTkCheckBox(
+            self,
+            text="Add slide numbers (Page X of Y)",
+            variable=self.page_numbers_var,
+            font=theme.FONT_BODY,
+        )
+        self.page_numbers_check.pack(fill="x", padx=12, pady=(2, 6))
+
+        # 4. Watermark Overlay
         wm_label = ctk.CTkLabel(self, text="Watermark (Optional):", font=theme.FONT_BODY_BOLD, anchor="w")
         wm_label.pack(fill="x", padx=12, pady=(6, 2))
 
@@ -302,4 +312,5 @@ class SettingsPanel(ctk.CTkScrollableFrame):
             watermark_opacity=0.2,
             password=password,
             handout_mode=handout_mode,
+            page_numbers=self.page_numbers_var.get(),
         )

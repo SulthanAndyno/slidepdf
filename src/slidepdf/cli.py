@@ -104,6 +104,8 @@ def cmd_convert(args: argparse.Namespace) -> int:
         watermark_opacity=args.watermark_opacity,
         password=args.password,
         handout_mode=args.handout,
+        page_numbers=args.page_numbers,
+        page_number_format=args.page_number_format,
     )
 
     out_file = Path(args.output) if args.output else None
@@ -187,6 +189,8 @@ def cmd_batch(args: argparse.Namespace) -> int:
         watermark_opacity=args.watermark_opacity,
         password=args.password,
         handout_mode=args.handout,
+        page_numbers=args.page_numbers,
+        page_number_format=args.page_number_format,
     )
 
     jobs = [ConversionJob(input_path=p) for p in found_files]
@@ -282,6 +286,8 @@ def build_parser() -> argparse.ArgumentParser:
         default=1,
         help="Handout layout (1: standard 1-up, 2: 2 slides/page, 4: 4 slides/page)",
     )
+    p_convert.add_argument("--page-numbers", action="store_true", help="Add page/slide numbering (Page X of Y)")
+    p_convert.add_argument("--page-number-format", default="Page {n} of {total}", help="Page number format string")
     p_convert.set_defaults(func=cmd_convert)
 
     # Command: batch
@@ -313,6 +319,8 @@ def build_parser() -> argparse.ArgumentParser:
         default=1,
         help="Handout layout (1: standard 1-up, 2: 2 slides/page, 4: 4 slides/page)",
     )
+    p_batch.add_argument("--page-numbers", action="store_true", help="Add page/slide numbering (Page X of Y)")
+    p_batch.add_argument("--page-number-format", default="Page {n} of {total}", help="Page number format string")
     p_batch.set_defaults(func=cmd_batch)
 
     # Command: doctor
