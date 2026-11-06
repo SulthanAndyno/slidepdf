@@ -8,3 +8,7 @@ and cross-platform support.
 __version__ = "1.0.0"
 __author__ = "SlidePDF Team"
 __license__ = "MIT"
+
+import logging
+# Silence internal noisy pypdf stream warnings
+logging.getLogger("pypdf").setLevel(logging.ERROR)

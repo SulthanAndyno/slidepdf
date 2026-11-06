@@ -121,3 +121,34 @@ def test_corrupted_image_handling(tmp_path: Path):
 
     with pytest.raises(ValueError, match="Corrupted or invalid image"):
         engine.convert(job, ConversionOptions())
+
+
+def test_embedded_image_decompression_bomb_handling(monkeypatch):
+    """Verify embedded image decompression bomb in slide shape is safely handled."""
+    from PIL import Image
+    from reportlab.pdfgen import canvas
+    from unittest.mock import MagicMock
+
+    engine = NativePythonEngine()
+    fake_canvas = MagicMock(spec=canvas.Canvas)
+    fake_shape = MagicMock()
+    fake_shape.image.blob = b"dummy_bytes"
+
+    # Simulate PIL raising DecompressionBombError
+    def mock_open(*args, **kwargs):
+        img_mock = MagicMock()
+        img_mock.verify.side_effect = Image.DecompressionBombError("Oversized image bomb")
+        return img_mock
+
+    monkeypatch.setattr(Image, "open", mock_open)
+
+    # Should not raise exception or crash
+    engine._render_picture(
+        fake_canvas,
+        fake_shape,
+        left_pt=10,
+        bottom_pt=10,
+        w_pt=100,
+        h_pt=100,
+        options=ConversionOptions(),
+    )

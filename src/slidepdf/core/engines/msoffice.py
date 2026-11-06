@@ -107,15 +107,21 @@ class MSOfficeEngine(BaseEngine):
                     progress_callback(0.85, "Filtering requested slide pages...")
 
                 from pypdf import PdfReader, PdfWriter
-                reader = PdfReader(str(output_path))
                 writer = PdfWriter()
-                for slide_idx in target_indices:
-                    page_zero_indexed = slide_idx - 1
-                    if 0 <= page_zero_indexed < len(reader.pages):
-                        writer.add_page(reader.pages[page_zero_indexed])
+                with PdfReader(str(output_path)) as reader:
+                    for slide_idx in target_indices:
+                        page_zero_indexed = slide_idx - 1
+                        if 0 <= page_zero_indexed < len(reader.pages):
+                            writer.add_page(reader.pages[page_zero_indexed])
 
-                with open(output_path, "wb") as f_out:
-                    writer.write(f_out)
+                tmp_filtered = output_path.parent / f".tmp_{output_path.name}"
+                try:
+                    with open(tmp_filtered, "wb") as f_out:
+                        writer.write(f_out)
+                    tmp_filtered.replace(output_path)
+                finally:
+                    if tmp_filtered.exists():
+                        tmp_filtered.unlink(missing_ok=True)
 
         finally:
             if deck is not None:

@@ -302,9 +302,12 @@ class NativePythonEngine(BaseEngine):
         h_pt: float,
         options: ConversionOptions,
     ) -> None:
-        """Render embedded image with optional compression."""
+        """Render embedded image with optional compression and decompression bomb safety."""
         try:
             image_bytes = shape.image.blob
+            # Verify image integrity and guard against decompression bombs (CWE-409)
+            raw_check = Image.open(io.BytesIO(image_bytes))
+            raw_check.verify()
             pil_img = Image.open(io.BytesIO(image_bytes))
 
             # Quality compression if requested

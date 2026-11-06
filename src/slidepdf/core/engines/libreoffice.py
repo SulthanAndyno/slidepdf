@@ -169,15 +169,21 @@ class LibreOfficeEngine(BaseEngine):
             if options.slide_range and target_indices and len(target_indices) < total_slides:
                 from pypdf import PdfReader, PdfWriter
 
-                reader = PdfReader(str(expected_pdf))
                 writer = PdfWriter()
-                for slide_idx in target_indices:
-                    page_zero_indexed = slide_idx - 1
-                    if 0 <= page_zero_indexed < len(reader.pages):
-                        writer.add_page(reader.pages[page_zero_indexed])
+                with PdfReader(str(expected_pdf)) as reader:
+                    for slide_idx in target_indices:
+                        page_zero_indexed = slide_idx - 1
+                        if 0 <= page_zero_indexed < len(reader.pages):
+                            writer.add_page(reader.pages[page_zero_indexed])
 
-                with open(output_path, "wb") as f_out:
-                    writer.write(f_out)
+                tmp_out_f = output_path.parent / f".tmp_{output_path.name}"
+                try:
+                    with open(tmp_out_f, "wb") as f_out:
+                        writer.write(f_out)
+                    tmp_out_f.replace(output_path)
+                finally:
+                    if tmp_out_f.exists():
+                        tmp_out_f.unlink(missing_ok=True)
             else:
                 shutil.copy2(expected_pdf, output_path)
 
