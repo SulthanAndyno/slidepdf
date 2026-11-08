@@ -29,14 +29,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Install LibreOffice on Ubuntu
+    - name: Install LibreOffice and Xvfb on Ubuntu
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y libreoffice libreoffice-impress
+        sudo apt-get install -y libreoffice libreoffice-impress xvfb
 
     - name: Run Test Suite
       env:
         PYTHONPATH: src
+      shell: bash
       run: |
-        pytest -v
+        if [ "$RUNNER_OS" = "Linux" ]; then
+          xvfb-run -a pytest -v
+        else
+          pytest -v
+        fi

@@ -16,14 +16,14 @@ def test_parse_slide_range_specific():
     assert parse_slide_range("8-12", 10) == [8, 9, 10]  # Clamped to total_slides
 
 
-def test_get_default_output_path():
-    inp = Path("/home/user/presentation.pptx")
+def test_get_default_output_path(tmp_path):
+    inp = tmp_path / "presentation.pptx"
     out = get_default_output_path(inp)
-    assert out == Path("/home/user/presentation.pdf")
+    assert out == (tmp_path / "presentation.pdf").resolve()
 
     custom_out = get_default_output_path(inp, prefix="clean_", suffix="_final")
-    assert custom_out == Path("/home/user/clean_presentation_final.pdf")
+    assert custom_out == (tmp_path / "clean_presentation_final.pdf").resolve()
 
-    dest_dir = Path("/tmp/output")
+    dest_dir = tmp_path / "output"
     out_in_dest = get_default_output_path(inp, output_dir=dest_dir)
-    assert out_in_dest == Path("/tmp/output/presentation.pdf")
+    assert out_in_dest == (dest_dir / "presentation.pdf").resolve()

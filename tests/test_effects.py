@@ -117,33 +117,56 @@ def test_full_post_processing_pipeline(tmp_path):
 def test_queue_reordering_logic():
     """Verify queue move up and move down behavior."""
     from slidepdf.ui.components.file_queue import FileQueueView
-
-    # Mock tkinter frame without displaying window
+    from unittest.mock import MagicMock
     import customtkinter as ctk
-    root = ctk.CTk()
-    root.withdraw()
 
+    root = None
     try:
-        queue_view = FileQueueView(root)
+        root = ctk.CTk()
+        root.withdraw()
+    except Exception:
+        # Gracefully handle headless CI runners without X11 server ($DISPLAY)
+        root = None
+
+    if root is not None:
+        try:
+            queue_view = FileQueueView(root)
+            job1 = ConversionJob(input_path=Path("/tmp/presentation1.pptx"))
+            job2 = ConversionJob(input_path=Path("/tmp/presentation2.pptx"))
+            job3 = ConversionJob(input_path=Path("/tmp/presentation3.pptx"))
+
+            queue_view.jobs = [job1, job2, job3]
+
+            # Move job 2 up -> should be first
+            queue_view.move_job_up(job2.job_id)
+            assert [j.job_id for j in queue_view.jobs] == [job2.job_id, job1.job_id, job3.job_id]
+
+            # Move job 2 up again -> already at index 0, should stay
+            queue_view.move_job_up(job2.job_id)
+            assert [j.job_id for j in queue_view.jobs] == [job2.job_id, job1.job_id, job3.job_id]
+
+            # Move job 2 down -> should be second
+            queue_view.move_job_down(job2.job_id)
+            assert [j.job_id for j in queue_view.jobs] == [job1.job_id, job2.job_id, job3.job_id]
+        finally:
+            root.destroy()
+    else:
+        # Mock-based validation in headless environments
+        queue_mock = MagicMock(spec=FileQueueView)
         job1 = ConversionJob(input_path=Path("/tmp/presentation1.pptx"))
         job2 = ConversionJob(input_path=Path("/tmp/presentation2.pptx"))
         job3 = ConversionJob(input_path=Path("/tmp/presentation3.pptx"))
+        queue_mock.jobs = [job1, job2, job3]
+        queue_mock._item_rows = {}
 
-        queue_view.jobs = [job1, job2, job3]
+        FileQueueView.move_job_up(queue_mock, job2.job_id)
+        assert [j.job_id for j in queue_mock.jobs] == [job2.job_id, job1.job_id, job3.job_id]
 
-        # Move job 2 up -> should be first
-        queue_view.move_job_up(job2.job_id)
-        assert [j.job_id for j in queue_view.jobs] == [job2.job_id, job1.job_id, job3.job_id]
+        FileQueueView.move_job_up(queue_mock, job2.job_id)
+        assert [j.job_id for j in queue_mock.jobs] == [job2.job_id, job1.job_id, job3.job_id]
 
-        # Move job 2 up again -> already at index 0, should stay
-        queue_view.move_job_up(job2.job_id)
-        assert [j.job_id for j in queue_view.jobs] == [job2.job_id, job1.job_id, job3.job_id]
-
-        # Move job 2 down -> should be second
-        queue_view.move_job_down(job2.job_id)
-        assert [j.job_id for j in queue_view.jobs] == [job1.job_id, job2.job_id, job3.job_id]
-    finally:
-        root.destroy()
+        FileQueueView.move_job_down(queue_mock, job2.job_id)
+        assert [j.job_id for j in queue_mock.jobs] == [job1.job_id, job2.job_id, job3.job_id]
 
 
 def test_generate_page_number_page():
